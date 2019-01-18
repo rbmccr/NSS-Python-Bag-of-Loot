@@ -39,12 +39,12 @@ class Child:
 
 # 1. Add a toy to the bag o' loot, and label it with the child's name who will receive it. The first argument must be the word add. The second argument is the gift to be delivered. The third argument is the name of the child.
 
-def add():
+def add(name, child_id):
 
   toy = {
-    "name": sys.argv[2],
+    "name": name,
     # get child's ID from db using name in command line
-    "childID": get_childID(sys.argv[3])
+    "childID": child_id
   }
 
   with sqlite3.connect(database) as conn:
@@ -183,32 +183,34 @@ def update_child_delivery_status(adding_item, child_id):
 
 # ============================================================================
 
-# trigger function call based on command line input
-if sys.argv[1] == 'add':
-  print("adding toy to database...")
-  child_id_from_add = add()
-  update_child_delivery_status(True, child_id_from_add)
+if __name__ == '__main__':
 
-if sys.argv[1] == 'remove':
-  print("removing toy from database...")
-  toy_id = get_toyID(sys.argv[3])
-  child_id = get_childID(sys.argv[2])
-  remove(toy_id)
-  update_child_delivery_status(False, child_id)
+  # trigger function call based on command line input
+  if sys.argv[1] == 'add':
+    print("adding toy to database...")
+    child_id_from_add = add(sys.argv[2],  get_childID(sys.argv[3]))
+    # update_child_delivery_status(True, child_id_from_add)
 
-if sys.argv[1] == 'ls':
-  try:
-    if sys.argv[2] != None:
-      print(f"listing {sys.argv[2]}'s stored present...")
-      child_id = get_childID(sys.argv[2])
-      ls(child_id)
-  except IndexError:
-    print("listing names of children who have received a present (none if no names listed)...")
-    ls(False) # don't pass a specific name in
+  if sys.argv[1] == 'remove':
+    print("removing toy from database...")
+    toy_id = get_toyID(sys.argv[3])
+    child_id = get_childID(sys.argv[2])
+    remove(toy_id)
+    # update_child_delivery_status(False, child_id)
 
-if sys.argv[1] == 'delivered':
-  child_id = get_childID(sys.argv[2])
-  toy_name = ls(child_id, True)
-  toy_id = get_toyID(toy_name) # if this method returns False, then there's not a toy in the database for this child
-  if toy_id != None:
-    delivered(child_id)
+  if sys.argv[1] == 'ls':
+    try:
+      if sys.argv[2] != None:
+        print(f"listing {sys.argv[2]}'s stored present...")
+        child_id = get_childID(sys.argv[2])
+        ls(child_id)
+    except IndexError:
+      print("listing names of children who have received a present (none if no names listed)...")
+      ls(False) # don't pass a specific name in
+
+  if sys.argv[1] == 'delivered':
+    child_id = get_childID(sys.argv[2])
+    toy_name = ls(child_id, True)
+    toy_id = get_toyID(toy_name) # if this method returns False, then there's not a toy in the database for this child
+    if toy_id != None:
+      delivered(child_id)
