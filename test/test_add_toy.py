@@ -21,7 +21,7 @@ class Testing(unittest.TestCase):
                         WHERE Toy.Name = '{toy_name}'
                         ''')
       toy_id = cursor.fetchone()
-      return (toy_id[0], toy_id[1])
+      return (toy_id[1], toy_id[2])
 
   def test_add_toy(self):
     self.assertEqual(add("Hotwheels", 1), 1) # returns same ID passed in
