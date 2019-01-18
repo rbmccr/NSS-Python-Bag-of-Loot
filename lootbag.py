@@ -105,6 +105,18 @@ def get_toyID(toy_name):
       print("Error when getting toy ID...", err)
 
 # 3. Produce a list of children currently receiving presents.
+def ls():
+  with sqlite3.connect(database) as conn:
+    cursor = conn.cursor()
+    try:
+      for row in cursor.execute('''SELECT *
+                        FROM Child
+                        WHERE Child.Delivered = 1
+                        '''):
+        print(row)
+
+    except sqlite3.OperationalError as err:
+      print("Error when getting list of children...", err)
 
 # 4. List toys in the bag o' loot for a specific child.
 
@@ -147,10 +159,14 @@ if sys.argv[1] == 'add':
 
 if sys.argv[1] == 'remove':
   print("removing toy from database...")
-  toy_id = get_toyID(sys.argv[2])
-  child_id = get_childID(sys.argv[3])
+  toy_id = get_toyID(sys.argv[3])
+  child_id = get_childID(sys.argv[2])
   remove(toy_id)
   update_child_delivery_status(False, child_id)
+
+if sys.argv[1] == 'ls':
+  print("listing children who have received presents...")
+  ls()
 
 # if __name__ == '__main__':
 #   child = Child("Jack")
