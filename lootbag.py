@@ -3,6 +3,10 @@ import sys
 
 database = 'bag_o_loot.db'
 
+# IMPORTANT:
+  # 1. Children must have unique names
+  # 2. Children can only receive one present (removing a present revokes a child's toy dilvery status)
+
 # ============================================================================
 
 # 0. Class created for establishing child props and method to add to database
@@ -105,21 +109,33 @@ def get_toyID(toy_name):
       print("Error when getting toy ID...", err)
 
 # 3. Produce a list of children currently receiving presents.
-def ls():
-  with sqlite3.connect(database) as conn:
-    cursor = conn.cursor()
-    try:
-      for row in cursor.execute('''SELECT *
-                        FROM Child
-                        WHERE Child.Delivered = 1
-                        '''):
-        print(row)
+def ls(child_id):
+  if child_id == False:
+    with sqlite3.connect(database) as conn:
+      cursor = conn.cursor()
+      try:
+        for row in cursor.execute('''SELECT *
+                          FROM Child
+                          WHERE Child.Delivered = 1
+                          '''):
+          print(row[1])
 
-    except sqlite3.OperationalError as err:
-      print("Error when getting list of children...", err)
+      except sqlite3.OperationalError as err:
+        print("Error when getting list of children...", err)
+  else:
+    # 4. List toys in the bag o' loot for a specific child.
+    with sqlite3.connect(database) as conn:
+      cursor = conn.cursor()
+      try:
+        cursor.execute(f'''SELECT Toy.Name
+                          FROM Toy
+                          WHERE Toy.childID = '{child_id}'
+                          ''')
+        toy_name = cursor.fetchone()
+        print("Toy: ", toy_name[0])
 
-# 4. List toys in the bag o' loot for a specific child.
-
+      except sqlite3.OperationalError as err:
+        print("Error when getting list of children...", err)
 
 # 5. Specify when a child's toys have been delivered.
 
@@ -166,9 +182,11 @@ if sys.argv[1] == 'remove':
   update_child_delivery_status(False, child_id)
 
 if sys.argv[1] == 'ls':
-  print("listing children who have received presents...")
-  ls()
-
-# if __name__ == '__main__':
-#   child = Child("Jack")
-#   child.add_child()
+  try:
+    if sys.argv[2] != None:
+      print(f"listing {sys.argv[2]}'s stored present...")
+      child_id = get_childID(sys.argv[2])
+      ls(child_id)
+  except IndexError:
+    print("listing names of children who have received a present...")
+    ls(False) # don't pass a specific name in
