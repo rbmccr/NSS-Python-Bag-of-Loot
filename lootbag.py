@@ -101,15 +101,17 @@ def get_toyID(toy_name):
                         FROM Toy
                         WHERE Toy.Name = '{toy_name}'
                         ''')
-
       toy_id = cursor.fetchone()
-      return toy_id[0]
+      if toy_id != None:
+        return toy_id[0]
 
     except sqlite3.OperationalError as err:
       print("Error when getting toy ID...", err)
 
+# ============================================================================
+
 # 3. Produce a list of children currently receiving presents.
-def ls(child_id):
+def ls(child_id, setting_delivered_status=False):
   if child_id == False:
     with sqlite3.connect(database) as conn:
       cursor = conn.cursor()
@@ -132,12 +134,21 @@ def ls(child_id):
                           WHERE Toy.childID = '{child_id}'
                           ''')
         toy_name = cursor.fetchone()
-        print("Toy: ", toy_name[0])
+        try:
+          if setting_delivered_status == True: # IF statement used with #5 to handle delivery status
+            return toy_name[0]
+          else:
+            print("Toy: ", toy_name[0])
+        except TypeError:
+          print("This child has no toy listed in the database.")
+          return False
 
       except sqlite3.OperationalError as err:
         print("Error when getting list of children...", err)
 
-# 5. Specify when a child's toys have been delivered.
+# ============================================================================
+
+# 5. Specify when a child's toys have been delivered (sets false to true).
 def delivered(name):
   update_child_delivery_status(True, name)
 
@@ -170,6 +181,8 @@ def update_child_delivery_status(adding_item, child_id):
       except sqlite3.OperationalError as err:
         print("Error when updating delivered status after remove...", err)
 
+# ============================================================================
+
 # trigger function call based on command line input
 if sys.argv[1] == 'add':
   print("adding toy to database...")
@@ -190,9 +203,12 @@ if sys.argv[1] == 'ls':
       child_id = get_childID(sys.argv[2])
       ls(child_id)
   except IndexError:
-    print("listing names of children who have received a present...")
+    print("listing names of children who have received a present (none if no names listed)...")
     ls(False) # don't pass a specific name in
 
 if sys.argv[1] == 'delivered':
   child_id = get_childID(sys.argv[2])
-  delivered(child_id)
+  toy_name = ls(child_id, True)
+  toy_id = get_toyID(toy_name) # if this method returns False, then there's not a toy in the database for this child
+  if toy_id != None:
+    delivered(child_id)
