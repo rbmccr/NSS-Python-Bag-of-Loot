@@ -1,11 +1,11 @@
 import sqlite3
 import sys
 
-database = '../bag_o_loot.db' # TODO: CHANGE PATH WHEN RUNNING TESTS
+database = 'bag_o_loot.db' # TODO: CHANGE PATH WHEN RUNNING TESTS
 
 # IMPORTANT:
   # 1. Children must have unique names
-  # 2. Children can only receive one present (removing a present revokes a child's toy dilvery status)
+  # 2. Children can only receive one present (removing a present revokes a child's toy dilvery status in command line)
 
 # ============================================================================
 
@@ -38,7 +38,7 @@ class Child:
 # ============================================================================
 
 class Lootbag:
-  def __init__(self, db = '../bag_o_loot.db'): # TODO: CHANGE PATH WHEN RUNNING TESTS
+  def __init__(self, db = 'bag_o_loot.db'): # TODO: CHANGE PATH WHEN RUNNING TESTS
     self.db = db
 
 # 1. Add a toy to the bag o' loot, and label it with the child's name who will receive it. The first argument must be the word add. The second argument is the gift to be delivered. The third argument is the name of the child.
@@ -207,9 +207,9 @@ if __name__ == '__main__':
   if sys.argv[1] == 'remove':
     print("removing toy from database...")
     toy_id = lootbag.get_toyID(sys.argv[2])
-    # child_id = lootbag.get_childID(sys.argv[3])
+    child_id = lootbag.get_childID(sys.argv[3])
     lootbag.remove(toy_id)
-    # lootbag.update_child_delivery_status(False, child_id)
+    lootbag.update_child_delivery_status(False, child_id)
 
   if sys.argv[1] == 'ls':
     try:

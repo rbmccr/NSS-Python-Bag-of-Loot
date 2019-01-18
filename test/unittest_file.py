@@ -60,5 +60,15 @@ class Testing(unittest.TestCase):
     # a child's toys are displayed when child ID is explicitly provided
     self.assertEqual(self.lootbag.ls(1, False), "Rocket")
 
+# 5. Must be able to set the delivered property of a child's toys -- which defaults to false-- to true.
+
+  def test04_update_delivered(self):
+    # add item for user with ID = 4
+    self.lootbag.add("Skateboard", 4)
+    # update user 4 delivered status yields
+    self.lootbag.delivered(4)
+    # childID 4 ("Richard") toy appears in list all method
+    self.assertEqual(self.lootbag.ls(False, False), ["Brendan","Zac","Richard","Brad"])
+
 if __name__ == '__main__':
   unittest.main()
