@@ -53,7 +53,7 @@ def add():
         ''', (None, toy["name"], toy["childID"])
       )
 
-      # set child's delivered status to 1
+      # return data used to set child's toy delivery status to 1
       return toy["childID"]
 
     except sqlite3.OperationalError as err:
@@ -77,6 +77,32 @@ def get_childID(name):
 # ============================================================================
 
 # 2. Remove a toy from the bag o' loot in case a child's status changes before delivery starts.
+def remove(toy_id):
+
+  with sqlite3.connect(database) as conn:
+    cursor = conn.cursor()
+    try:
+      cursor.execute(f'''DELETE FROM Toy
+                        WHERE toyID = '{toy_id}'
+                        ''')
+
+    except sqlite3.OperationalError as err:
+      print("Error when attempting to remove toy from database...", err)
+
+def get_toyID(toy_name):
+  with sqlite3.connect(database) as conn:
+    cursor = conn.cursor()
+    try:
+      cursor.execute(f'''SELECT Toy.toyID
+                        FROM Toy
+                        WHERE Toy.Name = '{toy_name}'
+                        ''')
+
+      toy_id = cursor.fetchone()
+      return toy_id[0]
+
+    except sqlite3.OperationalError as err:
+      print("Error when getting toy ID...", err)
 
 # 3. Produce a list of children currently receiving presents.
 
@@ -101,21 +127,31 @@ def update_child_delivery_status(adding_item, child_id):
                           WHERE Child.childID = '{child_id}'
                         ''')
       except sqlite3.OperationalError as err:
-        print("Error when updating delivered status...", err)
+        print("Error when updating delivered status after add...", err)
   else:
-    # ....
-    print('something')
+    with sqlite3.connect(database) as conn:
+      cursor = conn.cursor()
+      try:
+        cursor.execute(f'''UPDATE Child
+                          SET Delivered = 0
+                          WHERE Child.childID = '{child_id}'
+                        ''')
+      except sqlite3.OperationalError as err:
+        print("Error when updating delivered status after remove...", err)
 
 # trigger function call based on command line input
 if sys.argv[1] == 'add':
   print("adding toy to database...")
-  id_from_add = add()
-  update_child_delivery_status(True, id_from_add)
+  child_id_from_add = add()
+  update_child_delivery_status(True, child_id_from_add)
 
 if sys.argv[1] == 'remove':
   print("removing toy from database...")
-  # remove()
+  toy_id = get_toyID(sys.argv[2])
+  child_id = get_childID(sys.argv[3])
+  remove(toy_id)
+  update_child_delivery_status(False, child_id)
 
 # if __name__ == '__main__':
-#   child3 = Child("Zac")
-#   child3.add_child()
+#   child = Child("Jack")
+#   child.add_child()
