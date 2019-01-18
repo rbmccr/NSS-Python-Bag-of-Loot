@@ -1,8 +1,8 @@
 # NSS-Python-Bag-of-Loot
 Exercise practicing SQLite integration with Python
 
-# 1. Run sql file against database in main directory
-```bag_o_loot.db < tables.sql```
+# 1. Install sqlite3 and run sql file against database in main directory
+```sqlite3 bag_o_loot.db < tables.sql```
 
 # 2. Modify methods in lootbag.py and perform unit testing in <em>test</em> directory
 
