@@ -138,6 +138,8 @@ def ls(child_id):
         print("Error when getting list of children...", err)
 
 # 5. Specify when a child's toys have been delivered.
+def delivered(name):
+  update_child_delivery_status(True, name)
 
 # ============================================================================
 
@@ -190,3 +192,7 @@ if sys.argv[1] == 'ls':
   except IndexError:
     print("listing names of children who have received a present...")
     ls(False) # don't pass a specific name in
+
+if sys.argv[1] == 'delivered':
+  child_id = get_childID(sys.argv[2])
+  delivered(child_id)
