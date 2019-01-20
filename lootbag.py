@@ -43,11 +43,23 @@ class Lootbag:
 
 # 1. Add a toy to the bag o' loot, and label it with the child's name who will receive it. The first argument must be the word add. The second argument is the gift to be delivered. The third argument is the name of the child.
 
-  def add(self, name, child_id):
+  def add(self, toy_name, child_name):
+    """ Adds a toy to the database for the specified child.
 
+    Arguments:
+      toy_name {[string]}
+      child_name {[string]}
+
+    Returns:
+      [int] -- [child ID]
+    """
+
+    # get child ID using provided name
+    child_id = self.get_childID(child_name)
+
+    # create toy dictionary
     toy = {
-      "name": name,
-      # get child's ID from db using name in command line
+      "name": toy_name,
       "childID": child_id
     }
 
@@ -200,9 +212,7 @@ if __name__ == '__main__':
 
   # trigger function call based on command line input
   if sys.argv[1] == 'add':
-    print("adding toy to database...")
-    child_id_from_add = lootbag.add(sys.argv[2],  lootbag.get_childID(sys.argv[3]))
-    lootbag.update_child_delivery_status(True, child_id_from_add)
+    lootbag.add(sys.argv[2], sys.argv[3])
 
   if sys.argv[1] == 'remove':
     print("removing toy from database...")
